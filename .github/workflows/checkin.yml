@@ -1,0 +1,18 @@
+name: Checkin
+
+on:
+  schedule:
+    # GitHub Actions 的 cron 使用 UTC 时间：01:00 UTC = 北京时间每天 09:00
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 签到
+        env:
+          CHATGPT2API_SESSION: ${{ secrets.CHATGPT2API_SESSION }}
+        run: bash checkin.sh
