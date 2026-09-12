@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # image.mlgb7.com 每日签到
 # 用法: CHATGPT2API_SESSION=<session值> bash checkin.sh
-set -euo pipefail
+# 结果写入 checkin.log（每次覆盖，历史由 git 提交记录保存）
+set -uo pipefail
 
 : "${CHATGPT2API_SESSION:?请设置环境变量 CHATGPT2API_SESSION}"
 
@@ -23,13 +24,16 @@ http_code=$(curl -sS --max-time 30 -o "$resp_file" -w '%{http_code}' -X POST --d
   -H 'sec-fetch-mode: cors' \
   -H 'sec-fetch-dest: empty' \
   -H 'priority: u=1, i' \
-  -H "cookie: chatgpt2api_session=${CHATGPT2API_SESSION}")
+  -H "cookie: chatgpt2api_session=${CHATGPT2API_SESSION}") || http_code=000
 
-body="$(cat "$resp_file")"
+body="$(cat "$resp_file" 2>/dev/null)"
+
+printf '%s | HTTP %s | %s\n' "$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" "$http_code" "$body" > checkin.log
+
 echo "HTTP $http_code"
 echo "$body"
 
-if [ "$http_code" = "200" ] && grep -q 'checked_in_today' "$resp_file"; then
+if [ "$http_code" = "200" ] && printf '%s' "$body" | grep -q 'checked_in_today'; then
   echo '✅ 签到成功（或今天已签过）'
   exit 0
 fi
