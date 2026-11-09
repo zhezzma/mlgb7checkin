@@ -1,1 +1,1 @@
-2026-11-08 14:57 | HTTP 200 | {"awarded":true,"reward":147,"points":8040,"checked_in_today":true}
+2026-11-09 15:40 | HTTP 401 | {"detail":{"error":"密钥无效或已失效，请重新登录"}}
